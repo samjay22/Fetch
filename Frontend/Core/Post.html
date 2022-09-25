@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ecom Frontend</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="core.css">
+        <script src="core.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    </head>
+    <body>
+        <div class="navbar-fixed">
+            <nav>
+                <div class="naí-wrapper" >
+                    <a href="#" class="brand-logo center">Post Request View</a>
+                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                 
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            <form class="col s6">
+                <div class="row">
+                    <div class="input-field col s12">
+                       <div> 
+                           <div class="col">
+                            <li>
+                                <input id ="Payer" placeholder="Payer"></input> 
+                                <input id ="Points" placeholder="Points"></input>
+                                <input id ="TimeStamp" placeholder="TimeStamp"></input>
+                            </li>
+                            <submit onclick="AddTransaction()" type="button" id="add" class="btn">Add Transaction</submit >
+                           </div>
+                        </div>
+                        <div> 
+                            <li>
+                                <input id ="Redeem" placeholder="Points"></input> 
+                            </li>
+                            <submit onclick="RedeemPoints()" type="button" id="add" class="btn">Redeem</submit >
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+            
+            <div class="col s6">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">POST requests</span>
+                        <p>
+                            There are two API routes, RedeemPoints and AddTransaction. 
+
+                            AddTransaction takes 3 arguments, Payer, Points, TimeStamp
+                            RedeemPoints takes one argument Points
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ul class="col s12 collection" >
+                <li  id="items" class="collection-item">
+                    <span></span>
+                </li >
+            </ul>
+        </div>
+
+        <script>
+            
+            
+            const Endpoint ='https://keic1qsxuc.execute-api.us-east-1.amazonaws.com/';
+            const List = document.getElementById('items')
+            
+            function isJsonString(str) {
+                try {
+                    JSON.parse(str);
+                } catch (e) {
+                    return false;
+                }
+                return true;
+            }
+            
+            function POST(Query){
+
+                const List = document.getElementById("items")
+                
+                $(List).empty()
+                
+                $.ajax({
+                    type:'POST',
+                    statusCode : 200,
+                    url: Query,
+                    data: {},
+                    success: function(data) {
+                        
+                        if(!isJsonString(data)){
+                            alert(data)
+                            return
+                        }
+                        
+                        $.each(data, function(key, value){ 
+                           console.log(key, value)
+                            let li = document.createElement("li")
+                            li.innerText = "Payer: " + key + " " + "Points: " + value
+                            List.appendChild(li)
+                            
+                        })
+                    }, 
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(errorThrown); 
+                    }
+                })
+                alert("Transaction Added!")
+            }
+
+            function RedeemPoints() {
+                Points = document.getElementById('Redeem')
+
+                if(Points.value.length > 0){
+                    POST(Endpoint.concat("RedeemPoints?points=".concat(Points.value)))
+                }
+                else{
+                    alert("Invalid input!")
+                }
+                Points.value = ""
+            }
+
+            function AddTransaction(){
+
+                let Payer, Points, TimeStamp
+
+                Payer = document.getElementById('Payer')
+                Points = document.getElementById('Points')
+                TimeStamp = document.getElementById('TimeStamp')
+                
+                if (Payer.value.length > 0 && Points.value.length > 0 && TimeStamp.value.length  > 0){
+                    POST(Endpoint.concat("AddTransaction?payer=" + Payer.value + "&points=" + Points.value + "&timestamp=" + TimeStamp.value, Payer.value, Points.value, TimeStamp.value))
+
+                    TimeStamp.value = ""
+                    Points.value = ""
+                    Payer.value = ""
+
+                }
+                 else{
+                    alert("Invalid input!")
+                }
+            }
+            
+        </script>
+    </body>
+</html>
